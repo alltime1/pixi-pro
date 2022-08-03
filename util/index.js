@@ -21,20 +21,31 @@ async function analJson(json) {
   }) 
   return Object.keys(jsons.frames) 
 }
-const animal = (startStep,arr)=>{
-  console.log(startStep);
-  let i = 0;
-  // for(let i=0;i<arr.length;i++){
-  //   console.log(arr[i]);
-  //   startStep.change(arr[i])
-  // }
-  app.ticker.add(()=>{
-    startStep.change(arr[i])
-    i++;
-    if(i>arr.length-1){
-      i=0;
+const animal = (arr,rate)=>{
+  let index = 0;
+  let stop = false;
+  let anima =new PIXI.AnimatedSprite(arr);
+  anima.clear = ()=>{
+    clearInterval(startRunInter)
+  }
+  anima.stops = ()=>{
+    stop = true;
+  }
+  anima.starts = ()=>{
+    stop = false;
+  }
+  let startRunInter = setInterval(()=>{
+    if(stop){
+      return;
     }
-  })
+      anima.gotoAndStop(index)
+      index++;
+      if(index>=arr.length){
+        index = 0;
+      }
+  },1000 * rate)
+  return anima
+  
 }
 async function loadImage(imgPath, jsonListName) {
   let loader = app.loader;

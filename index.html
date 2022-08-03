@@ -45,9 +45,34 @@
   // })
   let user = allSprite.user;
   let monster = allSprite.monster;
-  ArStage(user)
+  // ArStage(user)
   // let t= false;
-  // animal(user,[user,monster,user])
+  
+  let btn = user.clone();
+  btn.x=300;
+  btn.y =500
+// ArStage(btn)
+btn.interactive = true;
+let t= true;
+let a =  animal([user,monster,monster,user,monster],.3)//动画
+ArStage(a)
+// setTimeout(()=>{
+//   a.clear()
+// },4000)
+// let anima = new PIXI.AnimatedSprite([user,monster,monster,user,monster]);
+// // anima.animationSpeed = .2;
+// console.log(anima);
+// ArStage(anima)
+// // anima.play()
+// anima.gotoAndStop(2)
+//   if(t){
+//     animal(user,"close");
+//     t=false;
+//   }else{
+//     animal(user,[user,monster,user])
+//     t=true
+//   }
+// })
   // app.ticker.add(()=>{
   //   if(t){
   //     user.change(allSprite.monster)
