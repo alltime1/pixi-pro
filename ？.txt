@@ -1,0 +1,2 @@
+  // let allSprite = await loadImage("image/treasureHunter.json",await analJson("image/treasureHunter.json"));
+  // pivot container选择中心点位置  anchor.set(0.5) tint 修改颜色

@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -29,76 +30,16 @@
   import { createCvs, loadImage, ArStage, analJson ,gravity ,animal} from "./util/index.js"
   let app = createCvs();
   app.renderer.backgroundColor = 0xffffff;
-  // let allSprite = await loadImage("image/treasureHunter.json",await analJson("image/treasureHunter.json"));
-  // pivot container选择中心点位置  anchor.set(0.5) tint 修改颜色
   let allSprite = await loadImage("image/user.jpg");
   await loadImage("image/monster.png");
-  // let user = allSprite.user;
- 
-  // app.ticker.add(()=>{
-  //   let t = allSprite.user;
-  //   console.log(t);
-    
-  //   allSprite.user = allSprite.monster;
-  //   allSprite.monster = t;
-
-  // })
   let user = allSprite.user;
-  let monster = allSprite.monster;
-  // ArStage(user)
-  // let t= false;
-  
-  let btn = user.clone();
-  btn.x=300;
-  btn.y =500
-// ArStage(btn)
-btn.interactive = true;
-let t= true;
-let a =  animal([user,monster,monster,user,monster],.3)//动画
-ArStage(a)
-// setTimeout(()=>{
-//   a.clear()
-// },4000)
-// let anima = new PIXI.AnimatedSprite([user,monster,monster,user,monster]);
-// // anima.animationSpeed = .2;
-// console.log(anima);
-// ArStage(anima)
-// // anima.play()
-// anima.gotoAndStop(2)
-//   if(t){
-//     animal(user,"close");
-//     t=false;
-//   }else{
-//     animal(user,[user,monster,user])
-//     t=true
-//   }
-// })
-  // app.ticker.add(()=>{
-  //   if(t){
-  //     user.change(allSprite.monster)
-  //     t= false;
-  //   }else{
-  //     // console.log(user.clone().path);
-  //     user.change(user.clone())
-  //     t= true;
-  //   }
-  // })
-  // setInterval(()=>{
-  //     if(t){
-  //     user.change(allSprite.monster)
-  //     t= false;
-  //   }else{
-      
-  //     // console.log(user.clone().path);
-  //     user.change(user.clone())
-  //     t= true;
-  //   }
-
-  // },1000/30)
-  // allSprite.user = allSprite.monster
-  // allSprite.user.change(allSprite.monster.path)
-  // // user.anchor.set(0.5)
-  // user.pivot.set(20,30)
-  // user.x = app.width/2;
-  // user.y = app.height/2;
+  user.active = true; // 激活重力
+  let monster = allSprite.monster; // 他应该挡住下落
+  monster.y = 300;
+  // monster.x = 600;
+  // user.x = 400;
+  ArStage(user)
+  ArStage(monster)
+  // let anima = animal([user,monster,monster,monster,user,monster],1) // 图片多个切换 动画
+  // ArStage(anima)
 </script>

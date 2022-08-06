@@ -9,43 +9,43 @@ const createCvs = (w = document.body.clientWidth, h = document.body.clientHeight
   app.renderer.view.style.position = "absolute";
   return app;
 }
-const gravity = (sprite,V0 = 0) =>{
+const gravity = (sprite, V0 = 0) => {
 }
 
 async function analJson(json) {
-  let jsons = await new Promise((resolve)=>{
+  let jsons = await new Promise((resolve) => {
     readTextFile(json, function (text) {
-    let date = JSON.parse(text);
-    resolve(date)
-  });
-  }) 
-  return Object.keys(jsons.frames) 
+      let date = JSON.parse(text);
+      resolve(date)
+    });
+  })
+  return (jsons.frames && Object.keys(jsons.frames)) || jsons.SubTexture
 }
-const animal = (arr,rate)=>{
+const animal = (arr, rate) => {
   let index = 0;
   let stop = false;
-  let anima =new PIXI.AnimatedSprite(arr);
-  anima.clear = ()=>{
+  let anima = new PIXI.AnimatedSprite(arr);
+  anima.clear = () => {
     clearInterval(startRunInter)
   }
-  anima.stops = ()=>{
+  anima.stops = () => {
     stop = true;
   }
-  anima.starts = ()=>{
+  anima.starts = () => {
     stop = false;
   }
-  let startRunInter = setInterval(()=>{
-    if(stop){
+  let startRunInter = setInterval(() => {
+    if (stop) {
       return;
     }
-      anima.gotoAndStop(index)
-      index++;
-      if(index>=arr.length){
-        index = 0;
-      }
-  },1000 * rate)
+    anima.gotoAndStop(index)
+    index++;
+    if (index >= arr.length) {
+      index = 0;
+    }
+  }, 1000 * rate)
   return anima
-  
+
 }
 async function loadImage(imgPath, jsonListName) {
   let loader = app.loader;
@@ -62,22 +62,23 @@ async function loadImage(imgPath, jsonListName) {
       if (imgPath.slice(-4) == "json") {
         jsonListName.forEach(jsonName => {
           allSpriteImg[jsonName.slice(0, -4)] = new Sprite(resources[imgPath].textures[jsonName]);
+          allSpriteImg[jsonName.slice(0, -4)].speed = 0; // 默认初始化向上速度为0
         })
-        console.log(allSpriteImg);
         resolve(allSpriteImg);
         return
       }
       //Create the cat sprite
       allSpriteImg[name] = new Sprite(resources[imgPath].texture);
-      allSpriteImg[name].clone = () =>{
-       let p = new Sprite(resources[imgPath].texture);
-       p.path = imgPath
+      allSpriteImg[name].clone = () => {
+        let p = new Sprite(resources[imgPath].texture);
+        p.path = imgPath
         return p;
       }
       // console.log(name,imgPath);
       // allSpriteImg[name].texture = PIXI.Texture.from(imgPath);
       allSpriteImg[name].path = imgPath
-      allSpriteImg[name].change = (sprit)=>{
+      allSpriteImg[name].speed = 0; // 默认初始化向上速度为0
+      allSpriteImg[name].change = (sprit) => {
         let path = sprit.path;
         let pathNameIndex = path.lastIndexOf("/") + 1;
         let pathNameLastIndex = path.lastIndexOf(".");
@@ -96,7 +97,49 @@ const ArStage = (name, remove) => {
   if (remove) {
     app.stage.removeChild(name)
   } else {
-    app.stage.addChild(name)
+    app.stage.addChild(name);
   }
+  let stratRunTime = 0;
+  const downing = t => { // ok
+    // 如果 位置到了格挡物就不能下降
+    // 获取所有格挡位置 这个现在就写横板格挡就不考虑跳出去其实只要上面那条线就可以
+    let gedangPost = [];
+    Object.keys(allSpriteImg).forEach(ew => {
+      if (allSpriteImg[ew].active != true) { // 都是格挡的
+        gedangPost.push({
+          x0: allSpriteImg[ew].x,
+          y: allSpriteImg[ew].y,
+          x1: allSpriteImg[ew].x + allSpriteImg[ew].width
+        })
+      }
+    })
+
+    // 判断是否触底
+    // user 应该是个小图片
+    let animaPosi = {
+      x0: name.x,
+      y: name.y + name.height,
+      x1: name.x + name.width
+    }
+    gedangPost.forEach(ew => {
+      // console.log(((ew.x0 <= animaPosi.x1 || ew.x1 >= animaPosi.x0) &&  ew.y >animaPosi.y));
+      // console.log(ew.x1 <= animaPosi.x0);
+      // console.log(ew.x0 , animaPosi.x1);
+      if ((ew.x0 >= animaPosi.x1) || (ew.x1 <= animaPosi.x0) || ((ew.x0 <= animaPosi.x1 || ew.x1 >= animaPosi.x0) &&  ew.y >animaPosi.y)) {//掉下去
+        console.log("我会掉下去");
+        stratRunTime += t;
+        let v = name.speed - 0.08 * stratRunTime;
+        name.y -= v;
+      } else {
+        return
+      }
+    })
+   
+  }
+  if (name.active == true) { // 激活下落
+
+    app.ticker.add(downing)
+  }
+
 }
-export { createCvs, loadImage, ArStage, analJson ,gravity,animal}
+export { createCvs, loadImage, ArStage, analJson, gravity, animal }
