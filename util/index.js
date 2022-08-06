@@ -44,8 +44,9 @@ const animal = (arr, rate) => {
       index = 0;
     }
   }, 1000 * rate)
+  console.log(anima);
+  anima.active = true;
   return anima
-
 }
 async function loadImage(imgPath, jsonListName) {
   let loader = app.loader;
@@ -67,13 +68,24 @@ async function loadImage(imgPath, jsonListName) {
         resolve(allSpriteImg);
         return
       }
+
       //Create the cat sprite
       allSpriteImg[name] = new Sprite(resources[imgPath].texture);
       allSpriteImg[name].clone = () => {
+        let index= 0;
+        Object.keys(allSpriteImg).forEach(e=>{
+          if(e.indexOf(name)>-1 && name.length!=e.length){
+           index = Math.max(index,e.slice(+e.slice(name.length)))
+          }else{
+            index = 1;
+          }
+        })
         let p = new Sprite(resources[imgPath].texture);
         p.path = imgPath
-        return p;
+        allSpriteImg[name +index] = p;
+        return allSpriteImg[name +index];
       }
+     
       // console.log(name,imgPath);
       // allSpriteImg[name].texture = PIXI.Texture.from(imgPath);
       allSpriteImg[name].path = imgPath
@@ -94,12 +106,16 @@ async function loadImage(imgPath, jsonListName) {
   return resultPic
 }
 const ArStage = (name, remove) => {
+  console.log(name.active );
+  
   if (remove) {
     app.stage.removeChild(name)
   } else {
     app.stage.addChild(name);
   }
   let stratRunTime = 0;
+
+  let isStop = false;
   const downing = t => { // ok
     // 如果 位置到了格挡物就不能下降
     // 获取所有格挡位置 这个现在就写横板格挡就不考虑跳出去其实只要上面那条线就可以
@@ -113,7 +129,6 @@ const ArStage = (name, remove) => {
         })
       }
     })
-
     // 判断是否触底
     // user 应该是个小图片
     let animaPosi = {
@@ -122,22 +137,28 @@ const ArStage = (name, remove) => {
       x1: name.x + name.width
     }
     gedangPost.forEach(ew => {
+      if(name.speed>0){isStop = false}
+      if(isStop){
+        return;
+      }
       // console.log(((ew.x0 <= animaPosi.x1 || ew.x1 >= animaPosi.x0) &&  ew.y >animaPosi.y));
       // console.log(ew.x1 <= animaPosi.x0);
       // console.log(ew.x0 , animaPosi.x1);
       if ((ew.x0 >= animaPosi.x1) || (ew.x1 <= animaPosi.x0) || ((ew.x0 <= animaPosi.x1 || ew.x1 >= animaPosi.x0) &&  ew.y >animaPosi.y)) {//掉下去
-        console.log("我会掉下去");
         stratRunTime += t;
-        let v = name.speed - 0.08 * stratRunTime;
+        let v = (name.speed||0) - 0.08 * stratRunTime;        
         name.y -= v;
+        // name.y = 100
       } else {
+        name.speed=0;
+        isStop = true;
+        stratRunTime=0;
         return
       }
     })
    
   }
   if (name.active == true) { // 激活下落
-
     app.ticker.add(downing)
   }
 

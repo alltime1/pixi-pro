@@ -30,16 +30,26 @@
   import { createCvs, loadImage, ArStage, analJson ,gravity ,animal} from "./util/index.js"
   let app = createCvs();
   app.renderer.backgroundColor = 0xffffff;
-  let allSprite = await loadImage("image/user.jpg");
-  await loadImage("image/monster.png");
-  let user = allSprite.user;
-  user.active = true; // 激活重力
-  let monster = allSprite.monster; // 他应该挡住下落
-  monster.y = 300;
-  // monster.x = 600;
-  // user.x = 400;
-  ArStage(user)
-  ArStage(monster)
-  // let anima = animal([user,monster,monster,monster,user,monster],1) // 图片多个切换 动画
-  // ArStage(anima)
+  let allSprite = await loadImage("image/hero.png");
+  await loadImage("image/hero2.png");
+  await loadImage("image/hero3.png");
+  await loadImage("image/floor.png");
+  let hero = allSprite.hero;
+  hero.active = true; // 激活重力
+  allSprite.hero2.active = true;
+  allSprite.hero3.active = true;
+  let floor = allSprite.floor; // 他应该挡住下落
+  let floor2 = allSprite.floor.clone()
+  floor2.y = 500;
+  floor2.x = 400;
+  floor.y = 700;
+  ArStage(floor)
+  ArStage(floor2) 
+  let anima = animal([hero,allSprite.hero2,allSprite.hero3],.3) // 图片多个切换 动画
+ ArStage(anima)
+ floor.interactive = true;
+ floor.on("pointerdown",()=>{
+  anima.speed = 10;
+  anima.y = anima.y-10;
+ })
 </script>
